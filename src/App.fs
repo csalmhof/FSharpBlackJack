@@ -108,10 +108,16 @@ let getHigherSum cardList =
 let intToStr num =
     sprintf "%d" num 
 
+let playerInfoString playerCards =
+    let sum1,sum2 = getSums playerCards
+    sprintf "Player has (%d/%d)" sum1 sum2
+
+let dealerInfoString dealerCards =
+    let sum1,sum2 = getSums dealerCards
+    sprintf "Dealer has (%d/%d)" sum1 sum2
+
 let gameInfoString dealerCards playerCards =
-    let playerSum1,playerSum2 = getSums playerCards
-    let dealerSum1,dealerSum2 = getSums dealerCards
-    sprintf "Player has (%d/%d), Dealer has (%d/%d)" playerSum1 playerSum2 dealerSum1 dealerSum2
+    sprintf "%s, %s" (playerInfoString playerCards) (dealerInfoString dealerCards)
 
 let parseResult gameResult =
     match gameResult with
@@ -126,7 +132,7 @@ let openBlackJackGameTile dispatch (info : GameInfo) =
             [ Card.header []
                 [ Card.Header.title [] [ str (sprintf "PLAYING: Game Nr.: %d" info.Id) ] ]
               Card.content []
-                [ Content.content [] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ] ]
+                [ Content.content [] [ str (playerInfoString info.State.PlayerCards) ] ]
               Card.footer []
                 [ Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> HitCard info |> dispatch) ] ]
                     [ str "Hit" ]
