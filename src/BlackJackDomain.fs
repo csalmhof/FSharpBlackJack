@@ -429,14 +429,10 @@ module BlackJackImplementation =
     newGameState
 
   let rec private performStayActions gameState =
-    let afterDealerGotToken = giveDealerToken gameState
-    if isGameOver afterDealerGotToken then
-      afterDealerGotToken
-    else 
-      let afterDealerGotCard = giveDealerCard afterDealerGotToken
-      if not (isGameOver afterDealerGotCard) then
-        performStayActions afterDealerGotCard
-      else
+    let afterDealerGotCard = giveDealerCard gameState
+    if not (isGameOver afterDealerGotCard) then
+      performStayActions afterDealerGotCard
+    else
       afterDealerGotCard
 
   let newGame () =
@@ -459,6 +455,10 @@ module BlackJackImplementation =
     givenCardToPlayer, evaluateGameResult givenCardToPlayer
 
   let stayAction gameState =
-    let afterStayActions = performStayActions gameState
-    afterStayActions, evaluateGameResult afterStayActions
+    let gaveDealerToken = giveDealerToken gameState
+    if isGameOver gaveDealerToken then
+      gaveDealerToken, evaluateGameResult gaveDealerToken
+    else
+      let afterStayActions = performStayActions gaveDealerToken
+      afterStayActions, evaluateGameResult afterStayActions
 
