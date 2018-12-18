@@ -132,7 +132,12 @@ let openBlackJackGameTile dispatch (info : GameInfo) =
             [ Card.header []
                 [ Card.Header.title [] [ str (sprintf "PLAYING: Game Nr.: %d" info.Id) ] ]
               Card.content []
-                [ Content.content [] [ str (playerInfoString info.State.PlayerCards) ] ]
+                [ Content.content [] [
+                    div [] [ str (playerInfoString info.State.PlayerCards) ]
+                    div [] [
+                        for n in info.State.PlayerCards ->
+                            img  [ Class "content-card"
+                                   Src (getCardImg n) ] ] ] ]
               Card.footer []
                 [ Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> HitCard info |> dispatch) ] ]
                     [ str "Hit" ]
@@ -145,7 +150,16 @@ let finishedBlackJackGameTile dispatch (info : GameInfo) =
             [ Card.header []
                 [ Card.Header.title [] [ str (sprintf "FINISHED: Game Nr.: %d, GameStatus: %s" info.Id (parseResult info.Result)) ] ]
               Card.content []
-                [ Content.content [] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ] ]
+                [ Content.content [] [ 
+                    div [] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ]
+                    div [] [
+                        for n in info.State.PlayerCards ->
+                            img  [ Class "content-card"
+                                   Src (getCardImg n) ] ]  
+                    div [] [
+                        for n in info.State.DealerCards ->
+                            img  [ Class "content-card"
+                                   Src (getCardImg n) ] ] ] ]
               Card.footer []
                 [ ] ] ]
 
