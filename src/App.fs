@@ -144,29 +144,69 @@ let parseResult gameResult =
 
 let gameCardTileStyle =
     Style [
-        Padding 15
+        Padding 5
         TextAlign "center"
         VerticalAlign "middle"
         BackgroundColor "darkgreen"
         BoxShadow "0 0 3px black"
         BorderStyle "inset"
-        BorderColor "SaddleBrown "
+        BorderColor "SaddleBrown"
         MarginBottom -5
     ]
 
 let playerStateStyle =
     Style [
-        Padding 15
         TextAlign "center"
-        Margin 5
+        MarginBottom 5
         VerticalAlign "middle"
+        FontWeight "bold"  
+        Color "white" 
+    ]
+
+let spacerStyle =
+    Style [
+        Width "33.3%"
+        BackgroundColor "sienna"
+        MarginTop  -1
+    ]
+
+let buttonStyle =
+    Style [
+        Width "16.7%"
+        Height 50
+        TextAlign "center"
+        VerticalAlign "middle"
+        FontWeight "bold" 
+        Margin "auto"
+        BorderStyle "inset"
+        BorderColor "SaddleBrown"
+        BackgroundColor "BurlyWood"
+        MarginTop -1
+    ]
+
+let tileContentStyle =
+    Style [
+        Width "100%"
+        Margin "auto"
+        BackgroundImage "url('img/table.jpg')"
+        BackgroundRepeat "repeat"
+        BackgroundColor "brown"
+    ]
+
+let tileHeaderStyle =
+    Style [
+        BackgroundColor "sienna"
+        Width "100%"
+        Margin "auto"
+        Color "white"
     ]
 
 let openBlackJackGameTile dispatch (info : GameInfo) =
     Tile.tile [ Tile.IsChild; Tile.Size Tile.Is12; Tile.CustomClass "content-card" ]
         [ Card.card [ ]
             [ Card.header []
-                [ Card.Header.title [] [ str (sprintf "PLAYING: Game Nr.: %d" info.Id) ] ]
+                [ div[tileHeaderStyle] [Card.Header.title [] [ str (sprintf "PLAYING: Game Nr.: %d" info.Id) ] ] ]
+              div[tileContentStyle][
               Card.content []
                 [ Content.content [] [
                     div [playerStateStyle] [ str (playerInfoString info.State.PlayerCards) ]
@@ -177,18 +217,21 @@ let openBlackJackGameTile dispatch (info : GameInfo) =
                     div [gameCardTileStyle] [
                         (getFirstCard info.State.DealerCards)
                         img [ Class "content-card" 
-                              Src "img/folded.png" ] ] ] ]
+                              Src "img/folded.png" ] ] ] ] ]
+              
               Card.footer []
-                [ Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> HitCard info |> dispatch) ] ]
-                    [ str "Hit" ]
-                  Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> PlayerStays info |> dispatch) ] ]
-                    [ str "Stay" ] ] ] ]
+                [ div[spacerStyle] []; div[buttonStyle] [ Card.Footer.a [ GenericOption.Props  [ 
+                    OnClick (fun _ -> HitCard info |> dispatch) ] ]
+                    [  str "Hit" ]]
+                  div [buttonStyle] [Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> PlayerStays info |> dispatch) ] ]
+                    [ str "Stay" ] ]; div[spacerStyle] [] ] ]]
                     
 let finishedBlackJackGameTile dispatch (info : GameInfo) =
        Tile.tile [ Tile.IsChild; Tile.Size Tile.Is12; Tile.CustomClass "content-card" ]
         [ Card.card [ ]
             [ Card.header []
-                [ Card.Header.title [] [ str (sprintf "FINISHED: Game Nr.: %d, GameStatus: %s" info.Id (parseResult info.Result)) ] ]
+                [ div[tileHeaderStyle] [Card.Header.title [] [ str (sprintf "FINISHED: Game Nr.: %d, GameStatus: %s" info.Id (parseResult info.Result)) ] ] ]
+              div[tileContentStyle][
               Card.content []
                 [ Content.content [] [ 
                     div [playerStateStyle] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ]
@@ -199,10 +242,9 @@ let finishedBlackJackGameTile dispatch (info : GameInfo) =
                                    Src (getCardImg n) ] ]  
                     div [playerStateStyle] [ str "Dealer" ]
                     div [gameCardTileStyle] [
-
                         for n in info.State.DealerCards ->
                             img  [ Class "content-card"
-                                   Src (getCardImg n) ] ] ] ]
+                                   Src (getCardImg n) ] ] ] ]]
               Card.footer []
                 [ ] ] ]
 
