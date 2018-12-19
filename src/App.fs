@@ -133,6 +133,26 @@ let parseResult gameResult =
         | Won(Dealer) -> "Won By Dealer"
         | Draw -> "Draw"
 
+let gameCardTileStyle =
+    Style [
+        Padding 15
+        TextAlign "center"
+        VerticalAlign "middle"
+        BackgroundColor "darkgreen"
+        BoxShadow "0 0 3px black"
+        BorderStyle "inset"
+        BorderColor "SaddleBrown "
+        MarginBottom -5
+    ]
+
+let playerStateStyle =
+    Style [
+        Padding 15
+        TextAlign "center"
+        Margin 5
+        VerticalAlign "middle"
+    ]
+
 let openBlackJackGameTile dispatch (info : GameInfo) =
     Tile.tile [ Tile.IsChild; Tile.Size Tile.Is12; Tile.CustomClass "content-card" ]
         [ Card.card [ ]
@@ -140,8 +160,8 @@ let openBlackJackGameTile dispatch (info : GameInfo) =
                 [ Card.Header.title [] [ str (sprintf "PLAYING: Game Nr.: %d" info.Id) ] ]
               Card.content []
                 [ Content.content [] [
-                    div [] [ str (playerInfoString info.State.PlayerCards) ]
-                    div [] [
+                    div [playerStateStyle] [ str (playerInfoString info.State.PlayerCards) ]
+                    div [gameCardTileStyle] [
                         for n in info.State.PlayerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ] ] ]
@@ -158,12 +178,12 @@ let finishedBlackJackGameTile dispatch (info : GameInfo) =
                 [ Card.Header.title [] [ str (sprintf "FINISHED: Game Nr.: %d, GameStatus: %s" info.Id (parseResult info.Result)) ] ]
               Card.content []
                 [ Content.content [] [ 
-                    div [] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ]
-                    div [] [
+                    div [playerStateStyle] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ]
+                    div [gameCardTileStyle] [
                         for n in info.State.PlayerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ]  
-                    div [] [
+                    div [gameCardTileStyle] [
                         for n in info.State.DealerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ] ] ]
@@ -194,6 +214,7 @@ let toCardRows dispatch (titles : Game list) =
     |> chunkByOne []
     |> List.rev
     |> List.map ((List.map (toCard dispatch)) >> toCardRow)
+
 
 let view (model:Model) dispatch =   
     div []
