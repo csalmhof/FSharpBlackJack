@@ -103,11 +103,12 @@ open Fulma
 let getCardImg card = 
     "img/" + card.Color + "-" + card.Name + ".png"
 
-let getCardImgList cardList = 
+let getFirstCard cardList = 
     cardList 
     |> Seq.map(fun r -> getCardImg r) 
-    |> Seq.map(fun r -> img [Src r])
-    |> Seq.item 1
+    |> Seq.map(fun r -> img [ Class "content-card"
+                              Src r])
+    |> Seq.item 0
 
 let getHigherSum cardList =
     getConsideredSum cardList
@@ -164,7 +165,11 @@ let openBlackJackGameTile dispatch (info : GameInfo) =
                     div [gameCardTileStyle] [
                         for n in info.State.PlayerCards ->
                             img  [ Class "content-card"
-                                   Src (getCardImg n) ] ] ] ]
+                                   Src (getCardImg n) ] ]
+                    div [gameCardTileStyle] [
+                        (getFirstCard info.State.DealerCards)
+                        img [ Class "content-card" 
+                              Src "img/folded.png" ] ] ] ]
               Card.footer []
                 [ Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> HitCard info |> dispatch) ] ]
                     [ str "Hit" ]
