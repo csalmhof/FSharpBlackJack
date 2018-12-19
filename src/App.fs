@@ -78,11 +78,19 @@ let stay (gameInfo : GameInfo, model : Model) (d : Game) =
         else d
     | GameFinished _ -> d
 
+let getStateForNewGame gameState gameResult model=
+    if gameResult = Won(Player) then
+        let newGame = GameFinished {Id=model.GameNumber;State=gameState;Result=gameResult};
+        newGame
+    else
+        let newGame =GameInProcess {Id=model.GameNumber;State=gameState;Result=gameResult};
+        newGame
+
 let update (msg:Msg) (model:Model) =
     match msg with
     | CreateGame ->
         let newGameState,newGameResult = newGame ()
-        let newDraft = GameInProcess {Id=model.GameNumber;State=newGameState;Result=newGameResult};
+        let newDraft = getStateForNewGame newGameState newGameResult model
         { model with
             GameNumber = model.GameNumber + 1
             Games = newDraft::model.Games }
@@ -184,11 +192,14 @@ let finishedBlackJackGameTile dispatch (info : GameInfo) =
               Card.content []
                 [ Content.content [] [ 
                     div [playerStateStyle] [ str (gameInfoString info.State.DealerCards info.State.PlayerCards) ]
+                    div [playerStateStyle] [ str "Player" ]
                     div [gameCardTileStyle] [
                         for n in info.State.PlayerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ]  
+                    div [playerStateStyle] [ str "Dealer" ]
                     div [gameCardTileStyle] [
+
                         for n in info.State.DealerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ] ] ]
@@ -226,10 +237,9 @@ let view (model:Model) dispatch =
       [ Navbar.navbar [ Navbar.Color IsBlack ]
             [ Navbar.Brand.div []
                 [ Navbar.Item.a [ Navbar.Item.Props [ Href "#" ] ]
-                    [ str "FSharp BlackJack" ] ] ]
+                    [ str "FSharp BlackJack - Have fun :)" ] ] ]
         Container.container [ Container.IsFluid ]
-          [ h1 [ Class "is-size-1 app-title" ] [ str "Play a Game of BlackJack" ]
-            Tile.tile [ Tile.IsAncestor; Tile.IsVertical ]
+          [ Tile.tile [ Tile.IsAncestor; Tile.IsVertical ]
                 [ yield Tile.tile [ Tile.IsParent; Tile.Size Tile.Is12]
                     [ Tile.tile [ Tile.IsChild ]
                         [ Card.card []
