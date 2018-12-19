@@ -6,6 +6,11 @@ module BlackJackDomain =
     | Player
     | Dealer
 
+  type GameStatistic = 
+    { mutable Won:int 
+      mutable Lost:int
+      mutable Draw:int }
+
   type GameCard = 
     { Color : string 
       Name : string
@@ -380,6 +385,14 @@ module BlackJackImplementation =
           Won(Player)
         else 
           Won(Dealer)
+
+  let updateStatistic (gameResult : GameResult, stats:GameStatistic) =    
+    if gameResult = GameResult.Won(Player) then
+        stats.Won <- (stats.Won + 1)
+    elif gameResult = GameResult.Won(Dealer) then
+        stats.Lost <- (stats.Lost + 1)
+    elif gameResult = GameResult.Draw then
+        stats.Draw <- (stats.Draw + 1)  
  
   let cardsMatching card1 card2 =
     card1.Color = card2.Color && card1.Name = card2.Name

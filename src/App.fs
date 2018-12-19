@@ -23,7 +23,8 @@ type Game =
 
 type Model =
     { GameNumber : int
-      Games : Game list }
+      Games : Game list
+      GameStats : GameStatistic }
 
 type Msg =
 | CreateGame
@@ -32,11 +33,14 @@ type Msg =
 
 let init() : Model =
     { GameNumber = 1
-      Games = [] }
+      Games = []
+      GameStats = { Won = 0 
+                    Lost = 0 
+                    Draw = 0 }}
 
 // UPDATE
 
-let hit (gameInfo : GameInfo) (d : Game) =
+let hit (gameInfo : GameInfo, model : Model) (d : Game) =
     match d with
     | GameInProcess t ->
         if t.Id = gameInfo.Id then
@@ -45,7 +49,8 @@ let hit (gameInfo : GameInfo) (d : Game) =
 
             sprintf "Player got Card for Game Nr. %d" t.Id
             |> Browser.console.log
-            if not (newGameInfo.Result = InProcess) then
+            if not (newGameInfo.Result = InProcess) then                       
+                updateStatistic(newGameResult ,model.GameStats)
                 (GameFinished(newGameInfo))
             else
                 (GameInProcess(newGameInfo))
@@ -57,12 +62,14 @@ let hit (gameInfo : GameInfo) (d : Game) =
             (GameFinished (t))
         else d
 
-let stay (gameInfo : GameInfo) (d : Game) =
+let stay (gameInfo : GameInfo, model : Model) (d : Game) =
     match d with
     | GameInProcess t ->
         if t.Id = gameInfo.Id then 
             let newGameState,newGameResult = stayAction gameInfo.State
             let newGameInfo = {Id=gameInfo.Id;State=newGameState;Result=newGameResult}
+
+            updateStatistic(newGameResult ,model.GameStats)
 
             sprintf "Dealer got Cards for Game Nr. %d" t.Id
             |> Browser.console.log
@@ -82,12 +89,12 @@ let update (msg:Msg) (model:Model) =
     | HitCard gameInfo ->
         let games =
             model.Games
-            |> List.map (hit gameInfo)
+            |> List.map (hit (gameInfo, model))
         { model with Games = games }
     | PlayerStays gameInfo ->
         let games = 
             model.Games
-            |> List.map (stay gameInfo)
+            |> List.map (stay (gameInfo, model))
         { model with Games = games }
 
 // VIEW (rendered with React)
@@ -201,7 +208,8 @@ let view (model:Model) dispatch =
                     [ Tile.tile [ Tile.IsChild ]
                         [ Card.card []
                             [ Card.content []
-                                [ Content.content [] [ str ("Platzhalter") ] ]
+                                [ Content.content [] 
+                                    [ str (sprintf "Won: %d / Lost: %d / Draw: %d" model.GameStats.Won model.GameStats.Lost model.GameStats.Draw) ] ]
                               Card.footer []
                                 [ Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> dispatch CreateGame) ] ]
                                     [ str "Start a new Game" ] ] ] ] ]
