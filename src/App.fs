@@ -108,6 +108,7 @@ let update (msg:Msg) (model:Model) =
 // VIEW (rendered with React)
 
 open Fulma
+open Fulma
 let getCardImg card = 
     "img/" + card.Color + "-" + card.Name + ".png"
 
@@ -148,9 +149,10 @@ let gameCardTileStyle =
         TextAlign "center"
         VerticalAlign "middle"
         BackgroundColor "darkgreen"
-        BoxShadow "0 0 3px black"
         BorderStyle "inset"
         BorderColor "SaddleBrown"
+        BackgroundImage "url('img/felt.jpg')"
+        BackgroundRepeat "repeat"
         MarginBottom -5
     ]
 
@@ -160,7 +162,7 @@ let playerStateStyle =
         MarginBottom 5
         VerticalAlign "middle"
         FontWeight "bold"  
-        Color "white" 
+        Color "BurlyWood" 
     ]
 
 let spacerStyle =
@@ -168,6 +170,8 @@ let spacerStyle =
         Width "33.3%"
         BackgroundColor "sienna"
         MarginTop  -1
+        BackgroundImage "url('img/table.jpg')"
+        BackgroundRepeat "repeat"
     ]
 
 let buttonStyle =
@@ -193,12 +197,21 @@ let tileContentStyle =
         BackgroundColor "brown"
     ]
 
+let dealerStateStyle =
+    Style [
+        TextAlign "center"
+        Margin 5
+        VerticalAlign "middle"
+        FontWeight "bold"  
+        Color "BurlyWood" 
+    ]
 let tileHeaderStyle =
     Style [
-        BackgroundColor "sienna"
+        BackgroundColor "BurlyWood"
         Width "100%"
         Margin "auto"
-        Color "white"
+        BorderStyle "inset"
+        BorderColor "SaddleBrown"
     ]
 
 let openBlackJackGameTile dispatch (info : GameInfo) =
@@ -214,11 +227,11 @@ let openBlackJackGameTile dispatch (info : GameInfo) =
                         for n in info.State.PlayerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ]
+                    div [dealerStateStyle] [ str "Dealer" ]
                     div [gameCardTileStyle] [
                         (getFirstCard info.State.DealerCards)
                         img [ Class "content-card" 
-                              Src "img/folded.png" ] ] ] ] ]
-              
+                              Src "img/folded.png" ] ] ] ] ]              
               Card.footer []
                 [ div[spacerStyle] []; div[buttonStyle] [ Card.Footer.a [ GenericOption.Props  [ 
                     OnClick (fun _ -> HitCard info |> dispatch) ] ]
@@ -240,7 +253,7 @@ let finishedBlackJackGameTile dispatch (info : GameInfo) =
                         for n in info.State.PlayerCards ->
                             img  [ Class "content-card"
                                    Src (getCardImg n) ] ]  
-                    div [playerStateStyle] [ str "Dealer" ]
+                    div [dealerStateStyle] [ str "Dealer" ]
                     div [gameCardTileStyle] [
                         for n in info.State.DealerCards ->
                             img  [ Class "content-card"
@@ -273,6 +286,43 @@ let toCardRows dispatch (titles : Game list) =
     |> List.rev
     |> List.map ((List.map (toCard dispatch)) >> toCardRow)
 
+let tileCardStyle =
+    Style [
+        Width "100%"
+        Margin "auto"
+        BackgroundImage "url('img/pattern.jpg')"
+        BackgroundRepeat "repeat"
+        BackgroundColor "brown"
+        TextAlign "center"
+    ]
+
+let gameStateStyle =
+    Style [
+        FontWeight "bold" 
+        BackgroundColor "white"
+        Margin "auto"
+        FontSize "2em"
+        Width 400
+    ]
+
+let newGameStyle =
+    Style [
+        Width "16.7%"
+        TextAlign "center"
+        VerticalAlign "middle"
+        FontWeight "bold" 
+        Margin "auto"
+        BorderStyle "inset"
+        BorderColor "red"
+        BackgroundColor "white"
+    ]
+
+let newGameTitleStyle =
+    Style [
+        Width "100%"
+        BackgroundColor "black"
+        MarginTop  -1
+]
 
 let view (model:Model) dispatch =   
     div []
@@ -285,12 +335,15 @@ let view (model:Model) dispatch =
                 [ yield Tile.tile [ Tile.IsParent; Tile.Size Tile.Is12]
                     [ Tile.tile [ Tile.IsChild ]
                         [ Card.card []
-                            [ Card.content []
+                            [ div[tileCardStyle][Card.content []
                                 [ Content.content [] 
-                                    [ str (sprintf "Won: %d / Lost: %d / Draw: %d" model.GameStats.Won model.GameStats.Lost model.GameStats.Draw) ] ]
+                                    [ div[gameStateStyle] 
+                                    [str (sprintf "Won: %d  Lost: %d  Draw: %d" model.GameStats.Won 
+                                    model.GameStats.Lost model.GameStats.Draw)] ]
+                                ] ]
                               Card.footer []
-                                [ Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> dispatch CreateGame) ] ]
-                                    [ str "Start a new Game" ] ] ] ] ]
+                                [ div[newGameTitleStyle] [Card.Footer.a [ GenericOption.Props [ OnClick (fun _ -> dispatch CreateGame) ] ]
+                                    [ div[newGameStyle] [ str "Start a new Game" ] ] ] ] ]] ]
                   yield! model.Games |> toCardRows dispatch ] ] ]
 
 #if DEBUG
