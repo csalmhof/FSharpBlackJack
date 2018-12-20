@@ -290,9 +290,9 @@ let tileCardStyle =
     Style [
         Width "100%"
         Margin "auto"
-        BackgroundImage "url('img/pattern.jpg')"
-        BackgroundRepeat "repeat"
-        BackgroundColor "brown"
+        //BackgroundImage "url('img/pattern.jpg')"
+        //BackgroundRepeat "repeat"
+        BackgroundColor "white"
         TextAlign "center"
     ]
 
@@ -313,7 +313,7 @@ let newGameStyle =
         FontWeight "bold" 
         Margin "auto"
         BorderStyle "inset"
-        BorderColor "red"
+        //BorderColor "red"
         BackgroundColor "white"
     ]
 
